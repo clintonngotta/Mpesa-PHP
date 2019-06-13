@@ -1,0 +1,82 @@
+<?php
+class MpesaPayments 
+{
+    public $consumerKey = 'uwd4VCfOjYcpawEsAYAkRyUYKRgCBdJ7';
+    public $consumerSecret = 'cq1hvOrJMyQYtgHU';
+    public $access_token = '';
+    public $accessTokenUrl = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
+
+    public function __construct(){
+       $this->access_token = $this->GenerateAccessToken();
+    }
+
+    public function GenerateAccessToken()
+    {
+        $curl = curl_init($this->accessTokenUrl);
+        $headers = ['Content-Type:application/json; charset=utf8'];
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($curl, CURLOPT_HEADER, FALSE);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->consumerKey.':'.$this->consumerSecret);
+        $result = curl_exec($curl);
+        $status = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $result = json_decode($result);
+        $access_token = $result->access_token;
+        return $access_token;
+    }
+
+    public function RegisterC2BUrl($access_token)
+    {
+        $headers = ['Content-Type:application/json; charset=utf8'];
+        $url = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl';
+        $shortCode = '600256'; 
+        $validationUrl = 'https://www.boondoproperties.co.ke/MpesaApi/C2B/validation_url.php';
+        $confirmationUrl ='https://www.boondoproperties.co.ke/MpesaApi/C2B/confirmation.php';
+        $data = array(
+          'ShortCode' => $shortCode,
+          'ResponseType' => 'Confirmed',
+          'ConfirmationURL' => $confirmationUrl,
+          'ValidationURL' => $validationUrl
+        );
+
+        $headers = array('Content-Type:application/json','Authorization:Bearer '.$access_token);
+        $response  = $this->ProcessRequest($data, $headers, $url);
+        return $response;
+    }
+
+    public function SimulateC2B($access_token)
+    {
+        $headers = array('Content-Type:application/json','Authorization:Bearer '.$access_token);
+        $simulateurl = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/simulate';  
+        $ShortCode  = '600256'; 
+        $amount     = '1';
+        $msisdn     = '254708374149';
+        $billRef    = 'Rent Payment'; 
+
+        $data = array(
+             'ShortCode' => $ShortCode,
+             'CommandID' => 'CustomerPayBillOnline',
+             'Amount' => $amount,
+             'Msisdn' => $msisdn,
+             'BillRefNumber' => $billRef
+        );
+        $response  = $this->ProcessRequest($data, $headers, $simulateurl);
+        return $response;
+    }
+
+    public function ProcessRequest($data, $headers, $url)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        $data = json_encode($data);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+        $response = curl_exec($curl);
+        return $response;
+    }
+
+}
+
+?>
