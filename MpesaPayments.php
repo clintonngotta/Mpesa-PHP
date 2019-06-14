@@ -96,6 +96,36 @@ class MpesaPayments
         $response  = $this->ProcessRequest($data, $headers, $initiate_url);
         return $response;
     }
+
+    public function TransactionStatusQuery($access_token)
+    {
+        $headers = array('Content-Type:application/json','Authorization:Bearer '.$access_token);
+        $ResultURL = 'https://www.boondoproperties.co.ke/MpesaApi/TransactionStatus/TransactionStatusResult.php';
+        $QueueTimeOutURL = 'https://www.boondoproperties.co.ke/MpesaApi/TransactionStatus/TransactionStatusResult.php';
+        $shortCode = '600256';
+        $TransactionId = 'NFC41H8NZU';
+        $Msisdn = '254708374149';
+        $Initiator ='apitest382';
+        $Remarks = 'Rent P';
+        $SecurityCredential = 'N3rRIwOaGr2qo/dc6ZwoqjoYQermkRxIhdabI2nMcx7GXYcdR0br2tPScyyJasjWWBHDcgk7z2rg7V99gOL1ZyVpAllWAnxtN0MfZ4RUaHruMhIGIe9/2cUqQN742aVkLrNPYmKCePuHoJRpbhh46iFTeR4lTQuchcFky3pn1zkfCVqcyMZZXftmVKdu5yUi36HVmjQkbhjoHiaTkvZU5bKrRB3ejsuM4uLbTRbGxa4tP1NObTAzXuU2lewmxksede3Vkm6PwspL8+TURE4EFWIm+11CZShkYVDVQLjTyqvtKAIufy7iLvSBuc/+28QHSbq4FumxVFV9rX9VpZu0vA==';
+
+        $url = 'https://sandbox.safaricom.co.ke/mpesa/transactionstatus/v1/query';
+        $data = array(
+          'Initiator' => $Initiator,
+          'SecurityCredential' => $SecurityCredential,
+          'CommandID' => 'TransactionStatusQuery',
+          'TransactionID' => $TransactionId,
+          'PartyA' => $shortCode,
+          'IdentifierType' => '4',
+          'ResultURL' => $ResultURL,
+          'QueueTimeOutURL' => $QueueTimeOutURL,
+          'Remarks' => $Remarks,
+          'Occasion' => ''
+        );
+
+        $response  = $this->ProcessRequest($data, $headers, $url);
+        return $response;
+    }
     public function ProcessRequest($data, $headers, $url)
     {
         $curl = curl_init();
