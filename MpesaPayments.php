@@ -4,6 +4,7 @@ class MpesaPayments
     public $consumerKey = 'uwd4VCfOjYcpawEsAYAkRyUYKRgCBdJ7';
     public $consumerSecret = 'cq1hvOrJMyQYtgHU';
     public $access_token = '';
+    public $ShortCode = '600256';
     public $accessTokenUrl = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
 
     public function __construct(){
@@ -64,6 +65,37 @@ class MpesaPayments
         return $response;
     }
 
+    public function StkPushRequest($access_token)
+    {
+        date_default_timezone_set('Africa/Nairobi');
+        $ShortCode = '174379';
+        $Passkey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
+        $Timestamp = date('YmdHis');    
+        $Password = base64_encode($ShortCode.$Passkey.$Timestamp);
+        $PartyA = '254713229184';
+        $AccountReference = 'tes123';
+        $TransactionDesc = 'Payrent';
+        $Amount = '1';
+        $initiate_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
+        $CallBackURL = 'https://www.boondoproperties.co.ke/MpesaApi/STKPUSH/callback.php';
+        $headers = array('Content-Type:application/json','Authorization:Bearer '.$access_token);
+        $data = array(
+            'BusinessShortCode' => $ShortCode,
+            'Password' => $Password,
+            'Timestamp' => $Timestamp,
+            'TransactionType' => 'CustomerPayBillOnline',
+            'Amount' => $Amount,
+            'PartyA' => $PartyA,
+            'PartyB' => $ShortCode,
+            'PhoneNumber' => $PartyA,
+            'CallBackURL' => $CallBackURL,
+            'AccountReference' => $AccountReference,
+            'TransactionDesc' => $TransactionDesc
+          );
+
+        $response  = $this->ProcessRequest($data, $headers, $initiate_url);
+        return $response;
+    }
     public function ProcessRequest($data, $headers, $url)
     {
         $curl = curl_init();
