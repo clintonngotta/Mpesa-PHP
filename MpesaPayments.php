@@ -31,8 +31,8 @@ class MpesaPayments
         $headers = ['Content-Type:application/json; charset=utf8'];
         $url = 'https://sandbox.safaricom.co.ke/mpesa/c2b/v1/registerurl';
         $shortCode = '600256'; 
-        $validationUrl = 'https://www.boondoproperties.co.ke/MpesaApi/C2B/validation_url.php';
-        $confirmationUrl ='https://www.boondoproperties.co.ke/MpesaApi/C2B/confirmation.php';
+        $validationUrl = 'https://ipaddress/MpesaApi/C2B/validation_url.php';
+        $confirmationUrl ='https://ipaddress/MpesaApi/C2B/confirmation.php';
         $data = array(
           'ShortCode' => $shortCode,
           'ResponseType' => 'Confirmed',
@@ -77,7 +77,7 @@ class MpesaPayments
         $TransactionDesc = 'Payrent';
         $Amount = '1';
         $initiate_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-        $CallBackURL = 'https://www.boondoproperties.co.ke/MpesaApi/STKPUSH/callback.php';
+        $CallBackURL = 'https://ipaddress/MpesaApi/STKPUSH/callback.php';
         $headers = array('Content-Type:application/json','Authorization:Bearer '.$access_token);
         $data = array(
             'BusinessShortCode' => $ShortCode,
@@ -100,8 +100,8 @@ class MpesaPayments
     public function TransactionStatusQuery($access_token)
     {
         $headers = array('Content-Type:application/json','Authorization:Bearer '.$access_token);
-        $ResultURL = 'https://www.boondoproperties.co.ke/MpesaApi/TransactionStatus/TransactionStatusResult.php';
-        $QueueTimeOutURL = 'https://www.boondoproperties.co.ke/MpesaApi/TransactionStatus/TransactionStatusResult.php';
+        $ResultURL = 'https://ipaddress/MpesaApi/TransactionStatus/TransactionStatusResult.php';
+        $QueueTimeOutURL = 'https://ipaddress/MpesaApi/TransactionStatus/TransactionStatusResult.php';
         $shortCode = '600256';
         $TransactionId = 'NFC41H8NZU';
         $Msisdn = '254708374149';
@@ -126,6 +126,74 @@ class MpesaPayments
         $response  = $this->ProcessRequest($data, $headers, $url);
         return $response;
     }
+
+    public function B2C($access_token)
+    {
+        $InitiatorName = '';
+        $SecurityCredential = ''; 
+        $CommandID = 'SalaryPayment';  # choose between SalaryPayment, BusinessPayment, PromotionPayment 
+        $Amount = '2500';
+        $PartyA = '';             # shortcode 1
+        $PartyB = '254708374149';             # Phone number you're sending money to
+        $Remarks = 'Salary';      # Remarks ** can not be empty
+        $ResultURL = 'https://ipaddress/MpesaApi/B2C/B2CResult.php';
+        $QueueTimeOutURL = 'https://ipaddress/MpesaApi/B2C/B2CResult.php';         
+        $Occasion = ''; 
+        $headers = ['Content-Type:application/json','Authorization:Bearer '.$access_token];
+        $url = 'https://sandbox.safaricom.co.ke/mpesa/b2c/v1/paymentrequest';
+        $data = array(
+            'InitiatorName' => $InitiatorName,
+            'SecurityCredential' => $SecurityCredential,
+            'CommandID' => $CommandID,
+            'Amount' => $Amount,
+            'PartyA' => $PartyA,
+            'PartyB' => $PartyB,
+            'Remarks' => $Remarks,
+            'QueueTimeOutURL' => $QueueTimeOutURL,
+            'ResultURL' => $ResultURL,
+            'Occasion' => $Occasion
+          );
+        
+        $response  = $this->ProcessRequest($data, $headers, $url);
+        return $response;
+    }
+
+    public function B2B($access_token)
+    {
+        $Initiator = '';
+        $SecurityCredential = ''; 
+        $SenderIdentifierType = '4';
+        $SenderIdentifierType = '4';
+        $CommandID = 'MerchantToMerchantTransfer';  # possible values are: BusinessPayBill, MerchantToMerchantTransfer, MerchantTransferFromMerchantToWorking, MerchantServicesMMFAccountTransfer, AgencyFloatAdvance
+        $Amount = '2500';
+        $PartyA = '600183';  # shortcode 1
+        $AccountReference = 'MerchantToMerchantTransfer'; # Account Reference mandatory for “BusinessPaybill” CommandID.
+        $PartyB = '600000';   #shortcode 2
+        $Remarks = 'Payment of Business';      # Remarks ** can not be empty
+        $ResultURL = 'https://ipaddress/MpesaApi/B2B/B2BResult.php';
+        $QueueTimeOutURL = 'https://ipaddress/MpesaApi/B2B/B2BResult.php';         
+        $headers = ['Content-Type:application/json','Authorization:Bearer '.$access_token];
+        $url = 'https://sandbox.safaricom.co.ke/mpesa/b2b/v1/paymentrequest';
+
+        $data = array(
+            'Initiator' => $InitiatorName,
+            'SecurityCredential' => $SecurityCredential,
+            'CommandID' => $CommandID,
+            'SenderIdentifierType' => $SenderIdentifierType,
+            'RecieverIdentifierType' => $SenderIdentifierType,
+            'Amount' => $Amount,
+            'PartyA' => $PartyA,
+            'PartyB' => $PartyB,
+            'AccountReference' => $AccountReference,
+            'Remarks' => $Remarks,
+            'QueueTimeOutURL' => $QueueTimeOutURL,
+            'ResultURL' => $ResultURL
+          );          
+        $response  = $this->ProcessRequest($data, $headers, $url);
+        return $response;
+    }
+
+
     public function ProcessRequest($data, $headers, $url)
     {
         $curl = curl_init();
