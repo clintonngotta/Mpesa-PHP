@@ -1,4 +1,4 @@
-<?php
+de<?php
 require_once("../MpesaPayments.php");
 
 $c2b = NEW MpesaPayments();

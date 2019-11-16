@@ -42,7 +42,8 @@
 	catch(PDOException $e){
 		$errLog = fopen('error.txt', 'a');
 		fwrite($errLog, $e->getMessage());
-		fclose($errLog);		$logFailedTransaction = fopen('failedTransaction.txt', 'a');
+		fclose($errLog);		
+		$logFailedTransaction = fopen('failedTransaction.txt', 'a');
 		fwrite($logFailedTransaction, json_encode($jsonMpesaResponse));
 		fclose($logFailedTransaction);
 	}

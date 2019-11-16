@@ -3,7 +3,7 @@ header("Content-Type: application/json");
 $callbackJSONData = file_get_contents('php://input');
 $jsonMpesaResponse = json_decode($mpesaResponse, true);
 $logFile = "stkPushCallbackResponse.json";
-$log = fopen($logFile, "a");
+$log = fopen($logFile, "w");
 fwrite($log, $jsonMpesaResponse);
 fclose($log);
 
